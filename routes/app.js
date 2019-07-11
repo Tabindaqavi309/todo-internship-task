@@ -5,13 +5,13 @@ const db = require('../db');
 const bodyParser = require("body-parser");
 //const morgan = require("morgan");
 const queryString = require('query-string');
-require('../model/Post.js')
+require('../model/Todos.js')
 require('../db')
 app.use(bodyParser.json())
 app.use('/apidoc', express.static('apidoc'))
 
 //.use(morgan());
-const Post = mongoose.model("POST")
+const Todos = mongoose.model("Todos")
 
 /**
  * @api {get} / It shows a message 
@@ -67,45 +67,45 @@ app.get('/todos', async (req, res) => {
         to = req.query.to ? req.query.to : null;
         if (to == null && from == null) {
             if (name == null && priority == null) {
-                const posts = await Post.find({});
-                return res.send(posts);
+                const todosObj = await Todos.find({});
+                return res.send(todosObj);
             }
             else if (name != null && priority == null) {
-                const posts = await Post.find({ name: new RegExp(name, 'i') });
-                return res.send(posts);
+                const todosObj = await Todos.find({ name: new RegExp(name, 'i') });
+                return res.send(todosObj);
             }
             else if (name == null && priority != null) {
-                const posts = await Post.find({ priority: priority });
-                return res.send(posts);
+                const todosObj = await Todos.find({ priority: priority });
+                return res.send(todosObj);
             }
             else {
-                const posts = await Post.find({ name: new RegExp(name, 'i'), priority: priority });
-                return res.send(posts);
+                const todosObj = await Todos.find({ name: new RegExp(name, 'i'), priority: priority });
+                return res.send(todosObj);
             }
         }
 
         if (name != null & priority != null) {
-            const posts = await Post.find({ name: new RegExp(name, 'i'), priority: priority, date: { $gt: from, $lt: to } });
-            return res.send(posts);
+            const todosObj = await Todos.find({ name: new RegExp(name, 'i'), priority: priority, date: { $gt: from, $lt: to } });
+            return res.send(todosObj);
         }
         else if (name != null && priority == null) {
-            const posts = await Post.find({ name: new RegExp(name, 'i'), date: { $gt: from, $lt: to } });
-            return res.send(posts);
+            const todosObj = await Todos.find({ name: new RegExp(name, 'i'), date: { $gt: from, $lt: to } });
+            return res.send(todosObj);
         }
         else if (name == null && priority != null) {
-            const posts = await Post.find({ priority: priority, date: { $gt: from, $lt: to } });
-            return res.send(posts);
+            const todosObj = await Todos.find({ priority: priority, date: { $gt: from, $lt: to } });
+            return res.send(todosObj);
         }
 
         else {
-            const posts = await Post.find({ date: { $gt: from, $lt: to } });
-            return res.send(posts);
+            const todosObj = await Todos.find({ date: { $gt: from, $lt: to } });
+            return res.send(todosObj);
         }
     }
 
 
     catch (error) {
-        return res.status(500).send({
+        return res.status(400).send({
             Status: "Error Caught!!",
             message: "The error is :",
             Error: error
@@ -135,8 +135,8 @@ app.get('/todos', async (req, res) => {
  */
 app.get('/todos/:id', async (req, res) => {
     try {
-        const posts = await Post.find({ _id: req.params.id });
-        return res.send(posts);
+        const todosObj = await Todos.find({ _id: req.params.id });
+        return res.send(todosObj);
     }
     catch (error) {
         return res.status(400).send({
@@ -173,7 +173,7 @@ app.get('/todos/:id', async (req, res) => {
  */
 
 app.post('/todos', async (req, res) => {
-    const post = new Post;
+    const post = new Todos;
     try {
         //console.log(new Date(req.body.date));
 
@@ -219,30 +219,30 @@ app.put('/todos', async (req, res) => {
     try {
 
         if (query["_id"] != null) {
-            const posts = await Post.findByIdAndUpdate({
+            const todosObj = await Todos.findByIdAndUpdate({
                 _id: query["_id"]
             }, req.body, {
                     new: true,
                     runValidators: true
                 })
-            return res.send(posts);
+            return res.send(todosObj);
         }
         else if (query.name != null) {
 
-            const posts = await Post.findOneAndUpdate({ name: new RegExp(req.query.name, 'i') }, { $set: { name: req.body.name, priority: req.body.priority, date: new Date(req.body.date) } }, {
+            const todosObj = await Todos.findOneAndUpdate({ name: new RegExp(req.query.name, 'i') }, { $set: { name: req.body.name, priority: req.body.priority, date: new Date(req.body.date) } }, {
                 new: true,
                 runValidators: true
             })
-            return res.send(posts);
+            return res.send(todosObj);
         }
         else if (query.priority != null) {
-            const posts = await Post.findOneAndUpdate({
+            const todosObj = await Todos.findOneAndUpdate({
                 priority: query.priority
             }, req.body, {
                     new: true,
                     runValidators: true
                 })
-            return res.send(posts);
+            return res.send(todosObj);
         }
 
 
@@ -277,13 +277,13 @@ app.put('/todos/:id', async (req, res) => {
     const id = req.params.id;
 
     try {
-        const posts = await Post.findByIdAndUpdate({
+        const todosObj = await Todos.findByIdAndUpdate({
             _id: id
         }, req.body, {
                 new: true,
                 runValidators: true
             })
-        return res.send(posts);
+        return res.send(todosObj);
     }
     catch (err) {
         return res.status(400).send({
@@ -307,10 +307,10 @@ app.delete('/todos/:id', async (req, res) => {
     const id = req.params.id;
 
     try {
-        const posts = await Post.findByIdAndDelete({
+        const todosObj = await Todos.findByIdAndDelete({
             _id: id
         })
-        return res.send(posts);
+        return res.send(todosObj);
     }
     catch (err) {
         return res.status(400).send({

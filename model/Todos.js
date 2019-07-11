@@ -18,4 +18,4 @@ post_schema = mongoose.Schema({
 
 
 });
-module.exports = mongoose.model("POST", post_schema);
+module.exports = mongoose.model("Todos", post_schema);
