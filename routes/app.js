@@ -8,6 +8,8 @@ const queryString = require('query-string');
 require('../model/Post.js')
 require('../db')
 app.use(bodyParser.json())
+app.use('/apidoc', express.static('apidoc'))
+
 //.use(morgan());
 const Post = mongoose.model("POST")
 
@@ -173,7 +175,7 @@ app.get('/todos/:id', async (req, res) => {
 app.post('/todos', async (req, res) => {
     const post = new Post;
     try {
-        console.log(new Date(req.body.date));
+        //console.log(new Date(req.body.date));
 
         post.name = req.body.name;
         post.priority = req.body.priority;
