@@ -134,7 +134,7 @@ app.get('/todos', token, async (req, res) => {
  * @apiErrorExample {json} Find error
  *    HTTP/1.1 400 Internal Server Error
  */
-app.get('/todos/:id', token, async (req, res) => {
+app.get('/todos/:id', async (req, res) => {
     try {
         const todosObj = await Todos.find({ _id: req.params.id });
         return res.send(todosObj);
@@ -173,7 +173,7 @@ app.get('/todos/:id', token, async (req, res) => {
  *    HTTP/1.1 400 Internal Server Error
  */
 
-app.post('/todos', token, async (req, res) => {
+app.post('/todos', async (req, res) => {
     const post = new Todos;
     try {
 
