@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
  *    HTTP/1.1 500 Internal Server Error                   
  */
 
-app.get('/todos', token, async (req, res) => {
+app.get('/todos', async (req, res) => {
 
     let {
         name,
