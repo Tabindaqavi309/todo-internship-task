@@ -23,6 +23,85 @@ define({ "api": [
     "name": "Get"
   },
   {
+    "type": "get",
+    "url": "/profile",
+    "title": "It shows the profile of the user currently logged in",
+    "group": "Profile_Info",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Successfully LOGGEDIN</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "firstname",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "lastname",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "email",
+            "optional": false,
+            "field": "email",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "age",
+            "description": ""
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success",
+          "content": "   HTTP/1.1 200 OK\n{\n      {\n        \"firstName\": \"tabinda\",\n        \"lastName\": \"qavi\",\n        \"userName\": \"tabinda-qavi\",\n        \"age\": 20,\n        \"email\": \"tabindaqavi@gmail.com\"\n    }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "sampleRequest": [
+      {
+        "url": "https://todo-application-tabinda.herokuapp.com/profile"
+      }
+    ],
+    "error": {
+      "examples": [
+        {
+          "title": "Register error",
+          "content": "HTTP/1.1 400 Internal Server Error",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/usercrud.js",
+    "groupTitle": "Profile_Info",
+    "name": "GetProfile"
+  },
+  {
     "type": "delete",
     "url": "/todos/:id",
     "title": "Remove a todo",
@@ -432,5 +511,210 @@ define({ "api": [
     "filename": "routes/app.js",
     "groupTitle": "Todos",
     "name": "PutTodosId"
+  },
+  {
+    "type": "post",
+    "url": "/login",
+    "title": "for user log in",
+    "group": "User_LOGIN",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object[]",
+            "optional": false,
+            "field": "keys",
+            "description": "<p>username,password</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Input",
+          "content": "{\n    \"username\": \"tabinda-qavi\",\n   \"password\":\"abcetc\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Successfully LOGGEDIN</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "firstname",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "lastname",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "email",
+            "optional": false,
+            "field": "email",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "age",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": ""
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success",
+          "content": "   HTTP/1.1 200 OK\n{\n    \"message\": \"Successfully LOGIN\",\n    \"profile\": {\n        \"firstName\": \"tabinda\",\n        \"lastName\": \"qavi\",\n        \"userName\": \"tabinda-qavi\",\n        \"age\": 21,\n        \"email\": \"tabindaqavi@gmail.com\"\n    },\n    \"token\": \"4IiwiaWF0IjoxNTYzMjY1Mjg5fQ.ZKdduJHDpGT4wbLz8kO52yurOXwyXkhIOuhly6hp7iI\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "sampleRequest": [
+      {
+        "url": "https://todo-application-tabinda.herokuapp.com/profile/login"
+      }
+    ],
+    "error": {
+      "examples": [
+        {
+          "title": "Register error",
+          "content": "HTTP/1.1 400 Internal Server Error",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/usercrud.js",
+    "groupTitle": "User_LOGIN",
+    "name": "PostLogin"
+  },
+  {
+    "type": "post",
+    "url": "/signup",
+    "title": "for user Signup",
+    "group": "User_SIGNUP",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object[]",
+            "optional": false,
+            "field": "information",
+            "description": "<p>firstname,lastname,username,age,email,password</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Input",
+          "content": "{\n \t\"firstname\":\"Tabinda\",\n   \"lastname\" : \"Qavi\",\n    \"username\": \"tabinda-qavi\",\n     \"age\":20,\n  \"email\":\"tabindaqavi@gmail.com\",\n   \"password\":\"abcetc\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "firstname",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "lastname",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "email",
+            "optional": false,
+            "field": "email",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "age",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": ""
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success",
+          "content": "   HTTP/1.1 200 OK\n  {\n    \"_id\": \"5d2dac1149c70428eccb2b0a\",\n    \"firstName\": \"urwa\",\n    \"lastName\": \"sultana\",\n    \"userName\": \"xyz\",\n    \"email\": \"urwasultana@gmail.com\",\n    \"age\": 20,\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "sampleRequest": [
+      {
+        "url": "https://todo-application-tabinda.herokuapp.com/profile/signup"
+      }
+    ],
+    "error": {
+      "examples": [
+        {
+          "title": "Register error",
+          "content": "HTTP/1.1 400 Internal Server Error",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/usercrud.js",
+    "groupTitle": "User_SIGNUP",
+    "name": "PostSignup"
   }
 ] });

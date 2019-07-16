@@ -7,6 +7,40 @@ const bodyParser = require("body-parser");
 const Profile = require('../model/Profile.js');
 router.use(bodyParser.json());
 const token = require('./token.js');
+/**
+ * @api {post} /signup for user Signup
+ * @apiGroup User SIGNUP
+ * @apiParam {Object[]} information firstname,lastname,username,age,email,password
+ * @apiParamExample {json} Input
+ *    {
+ *     	"firstname":"Tabinda",
+ *       "lastname" : "Qavi",
+ *        "username": "tabinda-qavi",
+ *         "age":20,
+ *      "email":"tabindaqavi@gmail.com",
+ *       "password":"abcetc"
+ *    }
+ *
+ * @apiSuccess {String} firstname 
+ * @apiSuccess {String} lastname
+ * @apiSuccess {String} username  
+ * @apiSuccess {email} email
+ * @apiSuccess {Number} age
+ * @apiSuccess {String} password
+ * @apiSampleRequest https://todo-application-tabinda.herokuapp.com/profile/signup
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ *   {
+    "_id": "5d2dac1149c70428eccb2b0a",
+    "firstName": "urwa",
+    "lastName": "sultana",
+    "userName": "xyz",
+    "email": "urwasultana@gmail.com",
+    "age": 20,
+ * }
+ * @apiErrorExample {json} Register error
+ *    HTTP/1.1 400 Internal Server Error
+ */
 router.post('/signup', async (req, res) => {
     try {
         const {
@@ -38,6 +72,39 @@ router.post('/signup', async (req, res) => {
 
     }
 })
+/**
+ * @api {post} /login for user log in
+ * @apiGroup User LOGIN
+ * @apiParam {Object[]} keys username,password
+ * @apiParamExample {json} Input
+ *    {
+ *        "username": "tabinda-qavi",
+ *       "password":"abcetc"
+ *    }
+ *@apiSuccess {String} message Successfully LOGGEDIN
+ * @apiSuccess {String} firstname 
+ * @apiSuccess {String} lastname
+ * @apiSuccess {String} username  
+ * @apiSuccess {email} email
+ * @apiSuccess {Number} age
+ * @apiSuccess {String} password
+ * @apiSampleRequest https://todo-application-tabinda.herokuapp.com/profile/login
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ * {
+    "message": "Successfully LOGIN",
+    "profile": {
+        "firstName": "tabinda",
+        "lastName": "qavi",
+        "userName": "tabinda-qavi",
+        "age": 21,
+        "email": "tabindaqavi@gmail.com"
+    },
+    "token": "4IiwiaWF0IjoxNTYzMjY1Mjg5fQ.ZKdduJHDpGT4wbLz8kO52yurOXwyXkhIOuhly6hp7iI"
+}
+ * @apiErrorExample {json} Register error
+ *    HTTP/1.1 400 Internal Server Error
+ */
 router.post('/login', async (req, res) => {
 
     const {
@@ -103,6 +170,32 @@ router.post('/login', async (req, res) => {
 
     }
 })
+/**
+ * @api {get} /profile It shows the profile of the user currently logged in
+ * @apiGroup Profile Info
+ * *@apiSuccess {String} message Successfully LOGGEDIN
+ * @apiSuccess {String} firstname 
+ * @apiSuccess {String} lastname
+ * @apiSuccess {String} username  
+ * @apiSuccess {email} email
+ * @apiSuccess {Number} age
+ * @apiSampleRequest https://todo-application-tabinda.herokuapp.com/profile
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ * {
+      {
+        "firstName": "tabinda",
+        "lastName": "qavi",
+        "userName": "tabinda-qavi",
+        "age": 20,
+        "email": "tabindaqavi@gmail.com"
+    }
+}
+ * @apiErrorExample {json} Register error
+ *    HTTP/1.1 400 Internal Server Error
+*/
+ 
+
 router.get('/', token, (req, res) => {
     try {
         return res.send(req._user.toWeb());
@@ -115,18 +208,5 @@ router.get('/', token, (req, res) => {
         })
     }
 })
-//Format of token 
-//Authorization : Bearer <access_token>
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = router;
