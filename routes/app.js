@@ -1,17 +1,22 @@
 const express = require('express');
 const app = express();
 const mongoose = require("mongoose");
+const jwt = require('jsonwebtoken');
+const productRoutes = require('./usercrud.js');
 const db = require('../db');
 const bodyParser = require("body-parser");
 //const morgan = require("morgan");
 const queryString = require('query-string');
-require('../model/Todos.js')
+require('../model/Todos.js');
+require('../model/Profile.js');
 require('../db')
 app.use(bodyParser.json())
 app.use('/apidoc', express.static('apidoc'))
-
+app.use('/profile', productRoutes);
+const token = require('./token');
 //.use(morgan());
-const Todos = mongoose.model("Todos")
+const Todos = mongoose.model("Todos");
+const Users = mongoose.model("Profile");
 
 /**
  * @api {get} / It shows a message 
@@ -45,7 +50,7 @@ app.get('/', (req, res) => {
  *    HTTP/1.1 500 Internal Server Error                   
  */
 
-app.get('/todos', async (req, res) => {
+app.get('/todos', token, async (req, res) => {
 
     let {
         name,
@@ -57,10 +62,6 @@ app.get('/todos', async (req, res) => {
 
         from = new Date(from);
         to = new Date(to);
-        console.log(from)
-        console.log(to)
-        console.log(name)
-        console.log(priority)
         name = req.query.name ? req.query.name : null;
         priority = req.query.priority ? req.query.priority : null;
         from = req.query.from ? req.query.from : null;
@@ -133,7 +134,7 @@ app.get('/todos', async (req, res) => {
  * @apiErrorExample {json} Find error
  *    HTTP/1.1 400 Internal Server Error
  */
-app.get('/todos/:id', async (req, res) => {
+app.get('/todos/:id', token, async (req, res) => {
     try {
         const todosObj = await Todos.find({ _id: req.params.id });
         return res.send(todosObj);
@@ -172,13 +173,14 @@ app.get('/todos/:id', async (req, res) => {
  *    HTTP/1.1 400 Internal Server Error
  */
 
-app.post('/todos', async (req, res) => {
+app.post('/todos', token, async (req, res) => {
     const post = new Todos;
     try {
-        //console.log(new Date(req.body.date));
 
         post.name = req.body.name;
         post.priority = req.body.priority;
+        post.priority = post.priority.toLowerCase();
+    console.log(post.priority);
         post.date = new Date(req.body.date);
         await post.save();
         return res.send(post);
@@ -211,11 +213,11 @@ app.post('/todos', async (req, res) => {
  * @apiSampleRequest https://todo-application-tabinda.herokuapp.com/todos?name=abc
  * @apiSampleRequest https://todo-application-tabinda.herokuapp.com/todos?priority=high
  */
-app.put('/todos', async (req, res) => {
+app.put('/todos', token, async (req, res) => {
     const query = req.query;
 
-    console.log(query);
-    console.log(query.name);
+    //console.log(query);
+    // console.log(query.name);
     try {
 
         if (query["_id"] != null) {
@@ -236,13 +238,13 @@ app.put('/todos', async (req, res) => {
             return res.send(todosObj);
         }
         else if (query.priority != null) {
+            console.log(req.body);
             const todosObj = await Todos.findOneAndUpdate({
-                priority: query.priority
-            }, req.body, {
-                    new: true,
-                    runValidators: true
-                })
+                priority: req.query.priority
+            }, req.body);
+
             return res.send(todosObj);
+
         }
 
 
@@ -273,7 +275,7 @@ app.put('/todos', async (req, res) => {
  *    HTTP/1.1 400 Internal Server Error
  * @apiSampleRequest https://todo-application-tabinda.herokuapp.com/todos/5d24290b50d20b13a09d3f5b
  */
-app.put('/todos/:id', async (req, res) => {
+app.put('/todos/:id', token, async (req, res) => {
     const id = req.params.id;
 
     try {
@@ -302,7 +304,7 @@ app.put('/todos/:id', async (req, res) => {
  * @apiErrorExample {json} Delete error
  *    HTTP/1.1 400 Internal Server Error
  */
-app.delete('/todos/:id', async (req, res) => {
+app.delete('/todos/:id', token, async (req, res) => {
 
     const id = req.params.id;
 
