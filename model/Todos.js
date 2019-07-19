@@ -8,11 +8,16 @@ post_schema = mongoose.Schema({
     priority: {
 
         type: String,
-        required: true
+        required: true,
+        lowercase: true
     },
     date: {
         type: Date,
         required: true
+    },
+    UserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Profile'
     }
 
 

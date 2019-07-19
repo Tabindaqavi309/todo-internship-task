@@ -8,39 +8,39 @@ const bodyParser = require("body-parser");
 const Profile = require('../model/Profile.js');
 router.use(bodyParser.json())
 
-const verifyToken = (req, res, next) => {
-    const bearerHeader = req.headers['authorization']
-    if (typeof bearerHeader !== 'undefined') {
-        const bearer = bearerHeader.split(' ');
-        const bearerToken = bearer[1];
-        jwt.verify(bearerToken, 'secretkey', async (err, authData) => {
-            if (err) {
-                return res.status(400).json({
-                    message: "Wrong Token!!",
-                    error: err
-                })
-            }
-            else {
+// const verifyToken = (req, res, next) => {
+//     const bearerHeader = req.headers['authorization']
+//     if (typeof bearerHeader !== 'undefined') {
+//         const bearer = bearerHeader.split(' ');
+//         const bearerToken = bearer[1];
+//         jwt.verify(bearerToken, 'secretkey', async (err, authData) => {
+//             if (err) {
+//                 return res.status(400).json({
+//                     message: "Wrong Token!!",
+//                     error: err
+//                 })
+//             }
+//             else {
 
-                req._user = await Profile.findOne({
-                    _id: authData.user
-                });
+//                 req._user = await Profile.findOne({
+//                     _id: authData.user
+//                 });
 
-                next();
-            }
-        })
-    }
-    else {
-        return res.status(400).json(
-            {
-                message: "No Token"
-            }
-        );
-    }
-}
+//                 next();
+//             }
+//         })
+//     }
+//     else {
+//         return res.status(400).json(
+//             {
+//                 message: "No Token"
+//             }
+//         );
+//     }
+// }
 module.exports = function verifyToken(req, res, next) {
     const bearerHeader = req.headers['authorization'];
-    
+
     if (typeof bearerHeader !== 'undefined') {
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
@@ -52,11 +52,10 @@ module.exports = function verifyToken(req, res, next) {
                 })
             }
             else {
-
+                console.log(authData.user);
                 req._user = await Profile.findOne({
                     _id: authData.user
-                });
-
+                })
                 next();
             }
         })

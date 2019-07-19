@@ -34,6 +34,9 @@ const Profile = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+    },
+    profilePic: {
+        type: String
     }
 })
 Profile.pre('save', function (next) {
@@ -70,6 +73,7 @@ Profile.methods.toWeb = function () {
         userName: this.userName,
         age: this.age,
         email: this.email,
+        profilePic:this.profilePic
     }
 }
 // Profile.methods.ComparePassword = function (password) {

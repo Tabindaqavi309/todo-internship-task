@@ -7,6 +7,8 @@ const db = require('../db');
 const bodyParser = require("body-parser");
 //const morgan = require("morgan");
 const queryString = require('query-string');
+var multer = require('multer');
+var upload = multer({dest:'uploads/'});
 require('../model/Todos.js');
 require('../model/Profile.js');
 require('../db')
@@ -50,7 +52,7 @@ app.get('/', (req, res) => {
  *    HTTP/1.1 500 Internal Server Error                   
  */
 
-app.get('/todos', async (req, res) => {
+app.get('/todos', token, async (req, res) => {
 
     let {
         name,
@@ -60,49 +62,68 @@ app.get('/todos', async (req, res) => {
     } = req.query;
     try {
 
-        from = new Date(from);
-        to = new Date(to);
-        name = req.query.name ? req.query.name : null;
-        priority = req.query.priority ? req.query.priority : null;
-        from = req.query.from ? req.query.from : null;
-        to = req.query.to ? req.query.to : null;
-        if (to == null && from == null) {
-            if (name == null && priority == null) {
-                const todosObj = await Todos.find({});
+        const todosObj = await Todos.find({ UserId: req._user._id });
+        if (todosObj != null) {
+
+            from = new Date(from);
+            to = new Date(to);
+            name = req.query.name ? req.query.name : null;
+            priority = req.query.priority ? req.query.priority : null;
+            from = req.query.from ? req.query.from : null;
+            to = req.query.to ? req.query.to : null;
+            if (to == null && from == null) {
+                if (name == null && priority == null) {
+
+
+                    return res.send(todosObj);
+                }
+                else if (name != null && priority == null) {
+                    const todosObj = await Todos.find({ UserId: req._user._id, name: new RegExp(name, 'i') }, (err, doc) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            console.log(doc);
+                        }
+                    })
+
+                    return res.send(todosObj);
+                }
+                else if (name == null && priority != null) {
+                    const todosObj = await Todos.find({ UserId: req._user._id, priority: priority });
+                    return res.send(todosObj);
+                }
+                else {
+                    const todosObj = await Todos.find({ UserId: req._user._id, name: new RegExp(name, 'i'), priority: priority });
+                    return res.send(todosObj);
+                }
+            }
+
+            if (name != null & priority != null) {
+                const todosObj = await Todos.find({ UserId: req._user._id, name: new RegExp(name, 'i'), priority: priority, date: { $gt: from, $lt: to } });
                 return res.send(todosObj);
             }
             else if (name != null && priority == null) {
-                const todosObj = await Todos.find({ name: new RegExp(name, 'i') });
+                const todosObj = await Todos.find({ UserId: req._user._id, name: new RegExp(name, 'i'), date: { $gt: from, $lt: to } });
                 return res.send(todosObj);
             }
             else if (name == null && priority != null) {
-                const todosObj = await Todos.find({ priority: priority });
+                const todosObj = await Todos.find({ UserId: req._user._id, priority: priority, date: { $gt: from, $lt: to } });
                 return res.send(todosObj);
             }
+
             else {
-                const todosObj = await Todos.find({ name: new RegExp(name, 'i'), priority: priority });
+                const todosObj = await Todos.find({ UserId: req._user._id, date: { $gt: from, $lt: to } });
                 return res.send(todosObj);
             }
         }
-
-        if (name != null & priority != null) {
-            const todosObj = await Todos.find({ name: new RegExp(name, 'i'), priority: priority, date: { $gt: from, $lt: to } });
-            return res.send(todosObj);
-        }
-        else if (name != null && priority == null) {
-            const todosObj = await Todos.find({ name: new RegExp(name, 'i'), date: { $gt: from, $lt: to } });
-            return res.send(todosObj);
-        }
-        else if (name == null && priority != null) {
-            const todosObj = await Todos.find({ priority: priority, date: { $gt: from, $lt: to } });
-            return res.send(todosObj);
-        }
-
         else {
-            const todosObj = await Todos.find({ date: { $gt: from, $lt: to } });
-            return res.send(todosObj);
+            return res.send({
+                message: "This User have no todos"
+            });
         }
     }
+
 
 
     catch (error) {
@@ -134,10 +155,19 @@ app.get('/todos', async (req, res) => {
  * @apiErrorExample {json} Find error
  *    HTTP/1.1 400 Internal Server Error
  */
-app.get('/todos/:id', async (req, res) => {
+app.get('/todos/:id', token, async (req, res) => {
     try {
-        const todosObj = await Todos.find({ _id: req.params.id });
-        return res.send(todosObj);
+        const todosObj = await Todos.findOne({ UserId: req._user._id, _id: req.params.id });
+        if (todosObj)
+            return res.send(todosObj);
+        else {
+            return res.status(400).send({
+                Status: "Error Caught!!",
+                message: "The Id that you've entered is incorrect!! ",
+                Error: error
+            })
+    
+        }
     }
     catch (error) {
         return res.status(400).send({
@@ -172,16 +202,22 @@ app.get('/todos/:id', async (req, res) => {
  * @apiErrorExample {json} Register error
  *    HTTP/1.1 400 Internal Server Error
  */
-
-app.post('/todos', async (req, res) => {
+app.post('/profilepicture', upload.single('profile'), (req, res) => {
+    try {
+      res.send(req.file);
+    }catch(err) {
+      res.send(400);
+    }
+  });
+app.post('/todos', token, async (req, res) => {
     const post = new Todos;
     try {
 
         post.name = req.body.name;
         post.priority = req.body.priority;
         post.priority = post.priority.toLowerCase();
-    console.log(post.priority);
         post.date = new Date(req.body.date);
+        post.UserId = req._user._id;
         await post.save();
         return res.send(post);
     }
@@ -222,7 +258,7 @@ app.put('/todos', token, async (req, res) => {
 
         if (query["_id"] != null) {
             const todosObj = await Todos.findByIdAndUpdate({
-                _id: query["_id"]
+                UserId: req._user._id, _id: query["_id"]
             }, req.body, {
                     new: true,
                     runValidators: true
@@ -231,7 +267,7 @@ app.put('/todos', token, async (req, res) => {
         }
         else if (query.name != null) {
 
-            const todosObj = await Todos.findOneAndUpdate({ name: new RegExp(req.query.name, 'i') }, { $set: { name: req.body.name, priority: req.body.priority, date: new Date(req.body.date) } }, {
+            const todosObj = await Todos.findOneAndUpdate({ UserId: req._user._id, name: new RegExp(req.query.name, 'i') }, { $set: { name: req.body.name, priority: req.body.priority, date: new Date(req.body.date) } }, {
                 new: true,
                 runValidators: true
             })
@@ -240,7 +276,7 @@ app.put('/todos', token, async (req, res) => {
         else if (query.priority != null) {
             console.log(req.body);
             const todosObj = await Todos.findOneAndUpdate({
-                priority: req.query.priority
+                UserId: req._user._id, priority: req.query.priority
             }, req.body);
 
             return res.send(todosObj);
@@ -280,7 +316,7 @@ app.put('/todos/:id', token, async (req, res) => {
 
     try {
         const todosObj = await Todos.findByIdAndUpdate({
-            _id: id
+            UserId: req._user._id, _id: id
         }, req.body, {
                 new: true,
                 runValidators: true
@@ -310,7 +346,7 @@ app.delete('/todos/:id', token, async (req, res) => {
 
     try {
         const todosObj = await Todos.findByIdAndDelete({
-            _id: id
+            UserId: req._user._id, _id: id
         })
         return res.send(todosObj);
     }
