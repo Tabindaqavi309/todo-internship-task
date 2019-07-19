@@ -12,11 +12,11 @@ const multer = require('multer');
 const cloudinary = require('cloudinary');
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
-    api_key : process.env.API_ID,
+    api_key: process.env.API_ID,
     api_secret: process.env.API_SECRET
 
 })
-const upload = multer({storage:multer.diskStorage({}),dest:'uploads/'});
+const upload = multer({ storage: multer.diskStorage({}), dest: 'uploads/' });
 /**
  * @api {post} /signup for user Signup
  * @apiGroup User SIGNUP
@@ -218,28 +218,28 @@ router.get('/', token, (req, res) => {
         })
     }
 })
-router.post('/uploadprofilepicture',token, upload.single('profile'), async (req, res) => {
+router.post('/uploadprofilepicture', token, upload.single('profile'), async (req, res) => {
     try {
-       
-   
-    const result = await cloudinary.v2.uploader.upload(req.file.path);
-    //console.log(result.secure_url);
-  const user = await Profile.findOneAndUpdate({_id : req._user._id },{ $set: {profilePic:result.secure_url}},(err,doc)=>{
-   if(err){
-       console.log(err)
-   }
-   else {
-       console.log(doc.profilePic);
-   }
-  })
-  
-    return res.send(user);
-    }catch(err) {
-     return res.json(
-        {
-            ERROR : err
-        }
-     );
+
+
+        const result = await cloudinary.v2.uploader.upload(req.file.path);
+        //console.log(result.secure_url);
+        const user = await Profile.findOneAndUpdate({ _id: req._user._id }, { $set: { profilePic: result.secure_url } }, (err, doc) => {
+            if (err) {
+                console.log(err)
+            }
+            else {
+                console.log(doc.profilePic);
+            }
+        })
+
+        return res.send(user);
+    } catch (err) {
+        return res.json(
+            {
+                ERROR: err
+            }
+        );
     }
-  });
+});
 module.exports = router;
