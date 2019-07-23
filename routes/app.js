@@ -7,8 +7,8 @@ const db = require('../db');
 const bodyParser = require("body-parser");
 //const morgan = require("morgan");
 const queryString = require('query-string');
-var multer = require('multer');
-var upload = multer({dest:'uploads/'});
+const cors = require('cors');
+app.use(cors());
 require('../model/Todos.js');
 require('../model/Profile.js');
 require('../db')
@@ -166,7 +166,7 @@ app.get('/todos/:id', token, async (req, res) => {
                 message: "The Id that you've entered is incorrect!! ",
                 Error: error
             })
-    
+
         }
     }
     catch (error) {
@@ -202,13 +202,7 @@ app.get('/todos/:id', token, async (req, res) => {
  * @apiErrorExample {json} Register error
  *    HTTP/1.1 400 Internal Server Error
  */
-app.post('/profilepicture', upload.single('profile'), (req, res) => {
-    try {
-      res.send(req.file);
-    }catch(err) {
-      res.send(400);
-    }
-  });
+
 app.post('/todos', token, async (req, res) => {
     const post = new Todos;
     try {

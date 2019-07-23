@@ -10,6 +10,58 @@ const token = require('./token.js');
 require('dotenv').config()
 const multer = require('multer');
 const cloudinary = require('cloudinary');
+const helper = require('sendgrid').mail;
+const async = require('async');
+function sendEmail(
+    parentCallback,
+    fromEmail,
+    toEmails,
+    subject,
+    textContent,
+    htmlContent
+  ) {
+    const errorEmails = [];
+    const successfulEmails = [];
+     const sg = require('sendgrid')('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');
+     async.parallel([
+      function(callback) {
+        // Add to emails
+        for (let i = 0; i < toEmails.length; i += 1) {
+          // Add from emails
+          const senderEmail = new helper.Email(fromEmail);
+          // Add to email
+          const toEmail = new helper.Email(toEmails[i]);
+          // HTML Content
+          const content = new helper.Content('text/html', htmlContent);
+          const mail = new helper.Mail(senderEmail, subject, toEmail, content);
+          var request = sg.emptyRequest({
+            method: 'POST',
+            path: '/v3/mail/send',
+            body: mail.toJSON()
+          });
+          sg.API(request, function (error, response) {
+            console.log('SendGrid');
+            if (error) {
+              console.log('Error response received');
+            }
+            console.log(response.statusCode);
+            console.log(response.body);
+            console.log(response.headers);
+          });
+        }
+        // return
+        callback(null, true);
+      }
+    ], function(err, results) {
+      console.log('Done');
+    });
+    parentCallback(null,
+      {
+        successfulEmails: successfulEmails,
+        errorEmails: errorEmails,
+      }
+    );
+}
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.API_ID,
@@ -52,15 +104,28 @@ const upload = multer({ storage: multer.diskStorage({}), dest: 'uploads/' });
  *    HTTP/1.1 400 Internal Server Error
  */
 router.post('/signup', async (req, res) => {
-    try {
-        const {
-            firstname,
-            lastname,
-            username,
-            email,
-            age,
-            password
-        } = req.body;
+    const {
+        firstname,
+        lastname,
+        username,
+        email,
+        age,
+        password
+    } = req.body;
+    async.parallel([
+        function (callback) {
+          sendEmail(
+            callback,
+            'tabindaqavi@todoapp.com',
+            [email],
+            'TODO APP',
+            'Text Content',
+            '<p style="font-size: 32px;">THANK YOU FOR SIGNING UP</p>'
+          );
+        }
+      ])
+      try {
+      
 
         const createdUser = await Profile.create({
             firstName: firstname,
@@ -242,4 +307,5 @@ router.post('/uploadprofilepicture', token, upload.single('profile'), async (req
         );
     }
 });
+
 module.exports = router;
