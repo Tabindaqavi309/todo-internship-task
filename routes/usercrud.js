@@ -195,8 +195,8 @@ router.post('/login', async (req, res) => {
                 })
             }
             if (!doc) {
-                return res.json({
-                    message: "Incorrect Username",
+                return res.status(400).send({
+                    message: "Incorrect Username" 
                 });
             }
 
@@ -209,7 +209,7 @@ router.post('/login', async (req, res) => {
                 }
                 if (!isMatched) {
 
-                    return res.json({
+                    return  res.status(400).send({
                         message: "Incorrect Password",
                     });
                 }
